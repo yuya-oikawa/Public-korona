@@ -1,0 +1,75 @@
+block head
+  meta(charset="utf-8")
+  meta(http-equiv="X-UA-Compatible" content="IE=edge")
+  meta(name="viewport" content="width=device-width, initial-scale=1.0")
+  meta(name="format-detection" content="telephone=no")
+
+  //- ページタイトル
+  if page.title
+    title #{page.title} | #{siteName}
+  else
+    title #{siteName}
+    
+  //- ページディスクリプション
+  if page.description
+    meta(name="description" content=page.description)
+  else if key === "index"
+    meta(name="description" content=siteDescription)
+  
+  
+  //- ページOGP用タイトル
+  if page.ogTitle
+    meta(property="og:title" content=page.ogTitle + ' | ' + siteName)
+  else if page.title
+    meta(property="og:title" content=page.title + ' | ' + siteName)
+  else
+    meta(property="og:title" content=siteName)
+  
+  //- ページOGP用説明文
+  if page.ogDescription
+    meta(property="og:description" content=page.ogDescription)
+  else if page.description
+    meta(property="og:description" content=page.description)
+  else
+    meta(property="og:description" content=siteDescription)
+  
+  //-  ページのタイプ（OGP）トップページはwebsiteなど。それ以下はarticle
+  meta(property="og:type" content=(key === "index" ? "website" : "article"))
+  
+  //- ページOGPURL
+  if key === "index"
+    meta(property="og:url" content=(environment === "development" ? testingDomain : domain))
+  else
+    meta(property="og:url" content=(environment === "development" ? testingDomain : domain)+page.name+".html")
+
+  //- サイトの名前 OGP
+  meta(property="og:site_name" content=siteName)
+  
+  //- サイトのOGP画像
+  - var ogpImage = page.ogImage || siteOgImage
+  meta(property="og:image" content=(environment === "development" ? testingDomain : domain)+ogpImage)
+  
+  //- Twitterでの画像の表示のされ方
+  meta(name="twitter:card" content="summary")
+  
+  //- Twitterで表示させる画像。
+  meta(name="twitter:image:src" content=(environment === "development" ? testingDomain : domain)+ogpImage)
+
+  //- 64pxと180pxの正方形のアイコンをそれぞれ以下のファイル名にし、imgディレクトリに設置する。
+  //- 詳細はREADME
+  - var pagePath = page.path || ""
+  if faviconUrl
+    link(rel="icon" href=pagePath+faviconUrl type="image/x-icon")
+  if iconUrl
+    link(rel="apple-touch-icon" href=pagePath+iconUrl sizes="180x180")
+
+  //- リリース時はインラインCSSにする。
+  block css
+    if environment === "development" || !inlining
+      link(rel="stylesheet" href=pagePath+readingCssUrl)
+    else if environment === "production" && inlining
+      style.
+        @@include(pagePath+readingCssUrl)
+    
+  if environment === "development" || page.noindex === 'yes'
+    meta(name="robots" content="noindex")

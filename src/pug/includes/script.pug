@@ -1,0 +1,8 @@
+- var pagePath = page.path || ""
+
+script(src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js")
+if environment == "development" || !inlining
+  script(src=pagePath+readingJsUrl defer)
+else if environment == "production" && inlining
+  script.
+    @@include(pagePath+readingJsUrl)

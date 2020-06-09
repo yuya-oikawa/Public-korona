@@ -1,0 +1,76 @@
+extends ../layouts/layout
+
+block append vars
+  - var key = "index"
+  - var page = settings[key]
+
+block contents
+  #app
+    main
+      h1 コロナ感染者情報を表示します。
+      p 条件を記載選択ください。
+      ul.contents
+        li
+          h2 都道府県別に感染者情報を知りたい。
+          p 都道府県:
+          .selectWrap
+            select(v-model="region")
+              optgroup(v-for='(prefecture, prefectureIndex) in regions', :label='prefecture.regionName', :key='`prefecture${prefectureIndex}`')
+                option(v-for='(place, placeIndex) in prefecture.place', :key='`place${placeIndex}`', :value='place') {{ place }}
+          .results
+            p(v-show='region !== ""') 累計感染者数：{{ searchResults.cases }}
+            p(v-show='region !== ""') 累計死者数：{{ searchResults.deaths }}
+            p(v-show='region !== ""') PCR検査数：{{ searchResults.pcr }}
+            p(v-show='region !== ""') 感染率：人口{{ searchResults.population }}人の{{ infectionRate }}%
+        li
+          h2 ２つの都道府県の「累計感染者数」を比較する機能
+          p 比較元データ：
+          .selectWrap
+            select(v-model="comparisonSource")
+                optgroup(v-for='(prefecture, prefectureIndex) in regions', :label='prefecture.regionName', :key='`prefecture${prefectureIndex}`')
+                  option(v-for='(place, placeIndex) in prefecture.place', :key='`place${placeIndex}`', :value='place') {{ place }}
+          p 比較先データ：
+          .selectWrap
+            select(v-model="comparisonDestination")
+                optgroup(v-for='(prefecture, prefectureIndex) in regions', :label='prefecture.regionName', :key='`prefecture${prefectureIndex}`')
+                  option(v-for='(place, placeIndex) in prefecture.place', :key='`place${placeIndex}`', :value='place') {{ place }}
+          p(v-show='comparisonResults.cases !== ""') 累計感染者数は<br>{{comparisonDestination}}より{{ comparisonSource }}が「{{ comparisonResults.cases }}」人多い
+          p(v-show='comparisonResults.deaths !== ""') 累計死者数は<br>{{comparisonDestination}}より{{ comparisonSource }}が「{{ comparisonResults.deaths }}」人多い
+          p(v-show='comparisonResults.pcr !== ""') PCR検査数は<br>{{comparisonDestination}}より{{ comparisonSource }}が「{{ comparisonResults.pcr }}」人多い
+        li
+          h2 指定人数に該当する都道府県を検索する。
+          p 累計感染者数が
+          input(v-model="searchCases.Number" style="width: 5em; height:27px" type="number")
+          span 人
+          .selectWrap
+            select(v-model="searchCases.upAndDown")
+              option 以上
+              option 以下
+          p 累計死者数が
+          input(v-model="searchDeaths.Number" style="width: 5em; height:27px" type="number")
+          span 人
+          .selectWrap
+            select(v-model="searchDeaths.upAndDown")
+              option 以上
+              option 以下
+          p PCR検査数が
+          input(v-model="searchPcr.Number" style="width: 5em; height:27px" type="number")
+          span 人
+          .selectWrap
+            select(v-model="searchPcr.upAndDown")
+              option 以上
+              option 以下
+          button(v-on:click="startSearch" style="margin: 5px; padding: 3px;") 検索
+      p(v-if="resultData.length > 0") 一致データ件数：{{ resultData.length }}
+
+      table#conditionalSearchResults
+        tr(v-if="resultData.length > 0")
+          th 都道府県名
+          th 累計感染者数
+          th 累計死者数
+          th PCR検査数
+        tr(v-for='(result, resultIndex) in resultData', :key='`result${resultIndex}`')
+          th {{ result[0] }}
+          th {{ result[1] }}
+          th {{ result[2] }}
+          th {{ result[3] }}
