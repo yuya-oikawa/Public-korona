@@ -1,10 +1,10 @@
 # 作品番号6
  及川が未経験から三ヶ月の期間で勉強・作成した中の6番目の作品(総数7)
  以下を使用している。
-  ・gulp
-  ・pug
-  ・sass
-  ・JavaScript
+ - gulp
+ - pug
+ - sass
+ - JavaScript
 
 ## 作品概要
  APIの使い方を学ぶために作成した作品
